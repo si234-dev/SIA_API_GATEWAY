@@ -49,14 +49,13 @@ class ProductGatewayController extends Controller
         return response()->json($response->json(), $response->status());
     }
 
-    public function update(Request $request, $id){
+   public function update(Request $request, $id)
+{
+    // Send JSON to the API
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json'
+    ])->put($this->apiURL.'/'.$id, $request->only(['product_name','price','stock']));
 
-        $response = Http::put($this->apiURL.'/'.$id, [
-            'product_name' => $request->product_name,
-            'price' => $request->price,
-            'stock' => $request->stock
-        ]);
-
-        return response()->json($response->json(), $response->status());
-    }
+    return response()->json($response->json(), $response->status());
+}
 }

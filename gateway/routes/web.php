@@ -24,36 +24,36 @@ $router->get('/users/{id}', function ($id) {
     return response()->json(json_decode($response), 200);
 });
 
-// POST (create) user
 $router->post('/users', function () {
-    $data = file_get_contents('php://input'); // raw JSON
+
+    $data = http_build_query($_POST);
 
     $ch = curl_init('http://localhost:8000/users');
-    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
-    return response()->json(json_decode($response), 200);
+    return $response;
 });
 
 // PUT (update) user
 $router->put('/users/{id}', function ($id) {
-    $data = file_get_contents('php://input'); // raw JSON
+
+    // parse x-www-form-urlencoded input from raw body
+    parse_str(file_get_contents("php://input"), $data);
 
     $ch = curl_init("http://localhost:8000/users/{$id}");
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
-    return response()->json(json_decode($response), 200);
+    return $response;
 });
 
 // DELETE user
@@ -84,35 +84,60 @@ $router->get('/products/{id}', function ($id) {
 });
 
 // POST (create) product
+// POST product
+// POST product
 $router->post('/products', function () {
-    $data = file_get_contents('php://input'); // raw JSON
+
+    // get input
+    $raw = file_get_contents('php://input');
+
+    // try decode JSON first
+    $data = json_decode($raw, true);
+
+    // if JSON fails (null), parse as x-www-form-urlencoded
+    if (!$data) {
+        parse_str($raw, $data);
+    }
+
+    if (!$data) {
+        return response()->json(['error' => 'No data provided'], 400);
+    }
 
     $ch = curl_init('http://localhost:8001/products');
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
-    return response()->json(json_decode($response), 200);
+    return $response;
 });
 
-// PUT (update) product
+// PUT product
 $router->put('/products/{id}', function ($id) {
-    $data = file_get_contents('php://input'); // raw JSON
+
+    $raw = file_get_contents('php://input');
+
+    // parse input
+    $data = json_decode($raw, true);
+    if (!$data) {
+        parse_str($raw, $data);
+    }
+
+    if (!$data) {
+        return response()->json(['error' => 'No data provided'], 400);
+    }
 
     $ch = curl_init("http://localhost:8001/products/{$id}");
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
-    return response()->json(json_decode($response), 200);
+    return $response;
 });
 
 // DELETE product

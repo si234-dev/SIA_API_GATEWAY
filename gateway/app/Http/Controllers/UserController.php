@@ -91,20 +91,20 @@ use Illuminate\Http\Request;
             */
     }
 
-    public function update(Request $request, $id) {
-        $user = User::where('id', $id)->first();
+    public function update($id) {
+        $data = file_get_contents('php://input');
 
+        $ch = curl_init("http://localhost:8001/users/{$id}");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+        $response = curl_exec($ch);
+        curl_close($ch);
 
-     // I-validate ang update inputs
-        $this->validate($request, [
-            'username' => 'required|string|max:20',
-        ]);
-
-        $user = User::findOrFail($id);
-        $user->update($request->all());
-        
-        return response()->json(['message' => 'User updated successfully', 'data' => $user]);
+        return response()->json(json_decode($response), 200);
+    }
 
 
 
@@ -125,8 +125,7 @@ use Illuminate\Http\Request;
         }
 
         */
-    }
-
+ 
 
 
 
