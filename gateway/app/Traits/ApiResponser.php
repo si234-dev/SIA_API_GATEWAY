@@ -5,19 +5,18 @@ use Illuminate\Http\Response;
 
 trait ApiResponser
 {
-    /**
-     * Return a success JSON response
-     */
     public function successResponse($data, $code = Response::HTTP_OK)
     {
-        return response()->json(['data' => $data], $code);
+        return response($data, $code)->header('Content-Type', 'application/json');
     }
 
-    /**
-     * Return an error JSON response
-     */
     public function errorResponse($message, $code)
     {
         return response()->json(['error' => $message, 'code' => $code], $code);
+    }
+
+    public function errorMessage($message, $code)
+    {
+        return response($message, $code)->header('Content-Type', 'application/json');
     }
 }

@@ -1,132 +1,107 @@
 <?php
-
 namespace App\Http\Controllers;
-use App\Models\User;
+
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Traits\ApiResponser;
+use App\Services\User1Service;
+use App\Services\User2Service;
 
- Class UserController extends Controller 
+class UserController extends Controller
 {
-    private $request;
-    public function __construct(Request $request){
-    $this->request = $request;
-    }
+    use ApiResponser;
 
+    public $user1Service;
+    public $user2Service;
 
-
-    public function getUsers(){
-    $users = User::all();
-    return response()->json($users, 200);
-    }
-    public function index()
+    public function __construct(User1Service $user1Service, User2Service $user2Service)
     {
-    $users = User::all();
-    return response()->json($users, 200);
+        $this->user1Service = $user1Service;
+        $this->user2Service = $user2Service;
     }
 
-    public function add(Request $request ){
-    $rules = [
-    'username' => 'required|string|unique:users,username|max:20',
-    'password' => 'required|string|min:5|max:20',
-    
-    ];
-    
-
-    $this->validate($request,$rules);
-
-    $user = User::create($request->all());
-
-    return response()->json([
-        'message' => 'User created successfully',
-        'data' => $user
-    ]);
-
-
-    }
-        public function show($id){
-
-
-// FindOrFail automatically throws an exception if not found
-        $user = User::findOrFail($id);
-        return response()->json(['message' => 'User retrieved successfully', 'data' => $user]);
-
-
-
-
-        /*
-    if (!User::find($id)) {
-        return response()->json([
-            'message' => 'User not found'
-        ], 404);
-    }
-    $user = User::findOrFail($id);
-    return response()->json([
-        'message' => 'User retrieved successfully',
-        'data' => $user
-    ]);
-
-    */
-
-
-     }
-
-    public function delete($id) {
-        $user = User::where('id', $id)->first();
-      
-    $user = User::findOrFail($id);
-        $user->delete();
-        return response()->json(['message' => 'User deleted successfully']);
-
-
-      /*
-        if($user){ 
-            $user->delete();
-            return response()->json([
-                'message' => 'User deleted successfully'
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'User not found'
-            ], 404);
-        }
-            */
+    public function getUsers()
+    {
+        return $this->successResponse($this->user1Service->obtainUsers1());
     }
 
-    public function update($id) {
-        $data = file_get_contents('php://input');
+    public function add(Request $request)
+    {
+        $rules = [
+            'username' => 'required|max:20',
+            'password' => 'required|max:20',
+            'jobid'    => 'required|numeric|min:1|not_in:0'
+        ];
 
-        $ch = curl_init("http://localhost:8001/users/{$id}");
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $this->validate($request, $rules);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $data = $request->all();
 
-        return response()->json(json_decode($response), 200);
-    }
-
-
-
-
-
-
-        /*
-        if($user){ 
-            $user->update($request->all());
-            return response()->json([
-                'message' => 'User updated successfully',
-                'data' => $user
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'User not found'
-            ], 404);
+        if ($data['jobid'] <= 5) {
+            $job = $this->user1Service->obtainUserJob($data['jobid']);
+            if (!$job) {
+                return $this->errorResponse('Job not found in Site 1', 404);
+            }
+            $response = $this->user1Service->createUser1($data);
+            return $this->successResponse($response, Response::HTTP_CREATED);
         }
 
-        */
- 
+        $job = $this->user2Service->obtainUserJob($data['jobid']);
+        if (!$job) {
+            return $this->errorResponse('Job not found in Site 2', 404);
+        }
 
+        $response = $this->user2Service->createUser2($data);
+        return $this->successResponse($response, Response::HTTP_CREATED);
+    }
 
+    public function show($id)
+    {
+        return $this->successResponse($this->user1Service->obtainUser1($id));
+    }
 
+    public function update(Request $request, $id)
+    {
+        $rules = [
+            'username' => 'required|max:20',
+            'password' => 'required|max:20',
+            'jobid'    => 'required|numeric|min:1|not_in:0'
+        ];
+
+        $this->validate($request, $rules);
+
+        $data = $request->all();
+
+        if ($data['jobid'] <= 5) {
+            $job = $this->user1Service->obtainUserJob($data['jobid']);
+            if (!$job) {
+                return $this->errorResponse('Job not found in Site 1', 404);
+            }
+            $updated = $this->user1Service->editUser1($data, $id);
+            return $this->successResponse($updated);
+        }
+
+        $job = $this->user2Service->obtainUserJob($data['jobid']);
+        if (!$job) {
+            return $this->errorResponse('Job not found in Site 2', 404);
+        }
+
+        $updated = $this->user2Service->editUser2($data, $id);
+        return $this->successResponse($updated);
+    }
+
+    public function delete($id)
+    {
+        return $this->successResponse($this->user1Service->deleteUser1($id));
+    }
+
+    public function getUserJobs()
+    {
+        return $this->successResponse($this->user1Service->obtainUserJobs());
+    }
+
+    public function showUserJob($id)
+    {
+        return $this->successResponse($this->user1Service->obtainUserJob($id));
+    }
 }

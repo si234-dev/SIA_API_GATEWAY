@@ -2,60 +2,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Response;
+use App\Traits\ApiResponser;
+use App\Services\User2Service;
 
-class ProductGatewayController extends Controller
+class ProductController extends Controller
 {
-    private $request;
-    private $apiURL = "http://127.0.0.1:8001/api/products";
+    use ApiResponser;
 
-    public function __construct(Request $request){
-        $this->request = $request;
-    }
+    public $product2Service;
 
-    public function getProducts(){
-        $response = Http::get($this->apiURL);
-        return response()->json($response->json(), $response->status());
-    }
-
-    public function index()
+    public function __construct(User2Service $product2Service)
     {
-        $response = Http::get($this->apiURL);
-        return response()->json($response->json(), $response->status());
+        $this->product2Service = $product2Service;
     }
 
-    public function add(Request $request){
-
-        $response = Http::post($this->apiURL, [
-            'product_name' => $request->product_name,
-            'price' => $request->price,
-            'stock' => $request->stock
-        ]);
-
-        return response()->json($response->json(), $response->status());
+    public function getProducts()
+    {
+        return $this->successResponse($this->product2Service->obtainProducts());
     }
 
-    public function show($id){
+    public function add(Request $request)
+    {
+        $rules = [
+            'name'        => 'required|string',
+            'description' => 'nullable|string',
+            'price'       => 'required|numeric'
+        ];
 
-        $response = Http::get($this->apiURL.'/'.$id);
+        $this->validate($request, $rules);
 
-        return response()->json($response->json(), $response->status());
+        $response = $this->product2Service->createProduct($request->all());
+        return $this->successResponse($response, Response::HTTP_CREATED);
     }
 
-    public function delete($id){
-
-        $response = Http::delete($this->apiURL.'/'.$id);
-
-        return response()->json($response->json(), $response->status());
+    public function show($id)
+    {
+        return $this->successResponse($this->product2Service->obtainProduct($id));
     }
 
-   public function update(Request $request, $id)
-{
-    // Send JSON to the API
-    $response = Http::withHeaders([
-        'Content-Type' => 'application/json'
-    ])->put($this->apiURL.'/'.$id, $request->only(['product_name','price','stock']));
+    public function update(Request $request, $id)
+    {
+        $rules = [
+            'name'        => 'required|string',
+            'description' => 'nullable|string',
+            'price'       => 'required|numeric'
+        ];
 
-    return response()->json($response->json(), $response->status());
-}
+        $this->validate($request, $rules);
+
+        $updated = $this->product2Service->editProduct($request->all(), $id);
+        return $this->successResponse($updated);
+    }
+
+    public function delete($id)
+    {
+        return $this->successResponse($this->product2Service->deleteProduct($id));
+    }
 }

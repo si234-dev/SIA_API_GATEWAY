@@ -1,16 +1,42 @@
 <?php
+// Correct Lumen Syntax: Middleware is an element in the array, not a chained method
+$router->group(['middleware' => 'client'], function () use ($router) {
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+    $router->get('/products', 'ProductController@getProducts');
+    $router->post('/products', 'ProductController@add');
+    $router->get('/products/{id}', 'ProductController@show');
+    $router->put('/products/{id}', 'ProductController@update');
+    $router->delete('/products/{id}', 'ProductController@delete');
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+    $router->get('/users', 'UserController@getUsers');
+    $router->post('/users', 'UserController@add');
+    $router->get('/users/{id}', 'UserController@show');
+    $router->put('/users/{id}', 'UserController@update');
+    $router->delete('/users/{id}', 'UserController@delete');
 });
+
+
+
+
+
 
 $router->get('/test-success', function () use ($router) {
     return response()->json(['message' => 'Success!']);
 });
 
+
+
+
+
+
 // ======= Users API (Site1 on port 8000) =======
+
+
+
+
+
+
+/*
 
 // GET all users
 $router->get('/users', function () {
@@ -152,5 +178,4 @@ $router->delete('/products/{id}', function ($id) {
     return response()->json(json_decode($response), 200);
 });
 
-
-
+*/
