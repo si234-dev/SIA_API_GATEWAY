@@ -26,7 +26,23 @@ $router->get('/test-success', function () use ($router) {
 
 
 
+use GuzzleHttp\Client;
 
+$router->get('/', function () {
+    return 'API Gateway is working!';
+});
+
+$router->get('/site1', function () {
+    $client = new Client();
+    $response = $client->get('https://microservice-site1.onrender.com');
+    return $response->getBody();
+});
+
+$router->get('/site2', function () {
+    $client = new Client();
+    $response = $client->get('https://microservice-site2.onrender.com');
+    return $response->getBody();
+});
 
 
 // ======= Users API (Site1 on port 8000) =======
