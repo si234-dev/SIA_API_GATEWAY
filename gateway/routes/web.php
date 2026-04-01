@@ -25,25 +25,27 @@ $router->get('/test-success', function () use ($router) {
 });
 
 
-
 use GuzzleHttp\Client;
-
-$router->get('/', function () {
-    return 'API Gateway is working!';
-});
 
 $router->get('/site1', function () {
     $client = new Client();
-    $response = $client->get('https://microservice-site1.onrender.com');
-    return $response->getBody();
+    $serviceUrl = env('USERS1_SERVICE_BASE_URL');
+    $secret = env('USERS1_SERVICE_SECRET');
+
+    $response = $client->get($serviceUrl . '/users?secret=' . $secret);
+    return response($response->getBody(), 200)
+        ->header('Content-Type', 'application/json');
 });
 
 $router->get('/site2', function () {
     $client = new Client();
-    $response = $client->get('https://microservice-site2.onrender.com');
-    return $response->getBody();
-});
+    $serviceUrl = env('USERS2_SERVICE_BASE_URL');
+    $secret = env('USERS2_SERVICE_SECRET');
 
+    $response = $client->get($serviceUrl . '/users?secret=' . $secret);
+    return response($response->getBody(), 200)
+        ->header('Content-Type', 'application/json');
+});
 
 // ======= Users API (Site1 on port 8000) =======
 
