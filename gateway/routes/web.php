@@ -32,9 +32,23 @@ $router->get('/site1', function () {
     $serviceUrl = env('USERS1_SERVICE_BASE_URL');
     $secret = env('USERS1_SERVICE_SECRET');
 
-    $response = $client->get($serviceUrl . '/users?secret=' . $secret);
-    return response($response->getBody(), 200)
-        ->header('Content-Type', 'application/json');
+    try {
+        $response = $client->get($serviceUrl . '/users?secret=' . $secret);
+        return response($response->getBody(), 200)
+            ->header('Content-Type', 'application/json');
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+        // For 401 Unauthorized or other client errors
+        return response()->json([
+            'error' => $e->getMessage(),
+            'code' => $e->getCode()
+        ], $e->getCode());
+    } catch (\Exception $e) {
+        // For unexpected errors
+        return response()->json([
+            'error' => 'Unexpected error: ' . $e->getMessage(),
+            'code' => 500
+        ], 500);
+    }
 });
 
 $router->get('/site2', function () {
@@ -42,9 +56,21 @@ $router->get('/site2', function () {
     $serviceUrl = env('USERS2_SERVICE_BASE_URL');
     $secret = env('USERS2_SERVICE_SECRET');
 
-    $response = $client->get($serviceUrl . '/users?secret=' . $secret);
-    return response($response->getBody(), 200)
-        ->header('Content-Type', 'application/json');
+    try {
+        $response = $client->get($serviceUrl . '/users?secret=' . $secret);
+        return response($response->getBody(), 200)
+            ->header('Content-Type', 'application/json');
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'code' => $e->getCode()
+        ], $e->getCode());
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Unexpected error: ' . $e->getMessage(),
+            'code' => 500
+        ], 500);
+    }
 });
 
 // ======= Users API (Site1 on port 8000) =======
