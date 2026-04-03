@@ -15,10 +15,13 @@ trait ConsumesExternalService
             $headers['Authorization'] = $this->secret;
         }
 
-        $response = $client->request($method, $requestUrl, [
-            'form_params' => $form_params,
-            'headers'     => $headers
-        ]);
+        $options = ['headers' => $headers];
+
+        if (!empty($form_params)) {
+            $options['json'] = $form_params;
+        }
+
+        $response = $client->request($method, $requestUrl, $options);
 
         return $response->getBody()->getContents();
     }
