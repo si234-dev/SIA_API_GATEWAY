@@ -29,7 +29,18 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 });
 
-
+$router->get('/debug-users', function () {
+    $service = new App\Services\User1Service();
+    try {
+        $result = $service->obtainUsers1();
+        return response()->json(['raw' => $result]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error_message' => $e->getMessage(),
+            'error_class' => get_class($e)
+        ]);
+    }
+});
 
 
 
