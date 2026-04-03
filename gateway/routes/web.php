@@ -45,6 +45,20 @@ $router->get('/debug-users', function () {
     }
 });
 
+$router->post('/debug-token', function () {
+    try {
+        $token = new App\Models\ApiToken();
+        $token->name = 'test';
+        $token->token = \Illuminate\Support\Str::random(40);
+        $token->save();
+        return response()->json($token, 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'class' => get_class($e)
+        ]);
+    }
+});
 
 
 $router->get('/test-success', function () use ($router) {
