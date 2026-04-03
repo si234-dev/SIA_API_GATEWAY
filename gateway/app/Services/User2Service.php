@@ -17,48 +17,48 @@ class User2Service
     }
 
     public function obtainProducts()
-    {
-        return $this->performRequest('GET', '/products');
-    }
+{
+    return $this->performRequest('GET', '/api/products');
+}
 
-    public function obtainProduct($id)
-    {
-        return $this->performRequest('GET', "/products/{$id}");
-    }
+public function obtainProduct($id)
+{
+    return $this->performRequest('GET', "/api/products/{$id}");
+}
 
-    public function createProduct($data)
-    {
-        return $this->performRequest('POST', '/products', $data);
-    }
+public function createProduct($data)
+{
+    return $this->performRequest('POST', '/api/products', $data);
+}
 
-    public function editProduct($data, $id)
-    {
-        return $this->performRequest('PUT', "/products/{$id}", $data);
-    }
+public function editProduct($data, $id)
+{
+    return $this->performRequest('PUT', "/api/products/{$id}", $data);
+}
 
-    public function deleteProduct($id)
-    {
-        return $this->performRequest('DELETE', "/products/{$id}");
-    }
+public function deleteProduct($id)
+{
+    return $this->performRequest('DELETE', "/api/products/{$id}");
+}
 
-        public function obtainUserJob($id)
-    {
-        return $this->performRequest('GET', "/userjob/{$id}");
-    }
+public function obtainUserJob($id)
+{
+    return $this->performRequest('GET', "/api/userjob/{$id}");
+}
 
-    public function createUser2($data)
-    {
-        return $this->performRequest('POST', '/users', $data);
-    }
+public function createUser2($data)
+{
+    return $this->performRequest('POST', '/api/users', $data);
+}
 
-    public function editUser2($data, $id)
-    {
-        return $this->performRequest('PUT', "/users/{$id}", $data);
-    }
+public function editUser2($data, $id)
+{
+    return $this->performRequest('PUT', "/api/users/{$id}", $data);
+}
 
-    public function deleteUser2($id)
-    {
-        return $this->performRequest('DELETE', "/users/{$id}");
-    }
+public function deleteUser2($id)
+{
+    return $this->performRequest('DELETE', "/api/users/{$id}");
+}
 
 }

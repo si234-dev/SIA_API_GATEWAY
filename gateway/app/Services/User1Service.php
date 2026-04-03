@@ -16,38 +16,39 @@ class User1Service
         $this->secret  = config('services.users1.secret');
     }
 
-    public function obtainUsers1()
-    {
-        return $this->performRequest('GET', '/users');
-    }
+   public function obtainUsers1()
+{
+    return $this->performRequest('GET', '/api/users');
+}
 
-    public function obtainUser1($id)
-    {
-        return $this->performRequest('GET', "/users/{$id}");
-    }
+public function obtainUser1($id)
+{
+    return $this->performRequest('GET', "/api/users/{$id}");
+}
 
-    public function createUser1($data)
-    {
-        return $this->performRequest('POST', '/users', $data);
-    }
+public function createUser1($data)
+{
+    return $this->performRequest('POST', '/api/users', $data);
+}
 
-    public function editUser1($data, $id)
-    {
-        return $this->performRequest('PUT', "/users/{$id}", $data);
-    }
+public function editUser1($data, $id)
+{
+    return $this->performRequest('PUT', "/api/users/{$id}", $data);
+}
 
-    public function deleteUser1($id)
-    {
-        return $this->performRequest('DELETE', "/users/{$id}");
-    }
+public function deleteUser1($id)
+{
+    return $this->performRequest('DELETE', "/api/users/{$id}");
+}
 
-    public function obtainUserJob($id)
-    {
-        return $this->performRequest('GET', "/userjob/{$id}");
-    }
+public function obtainUserJob($id)
+{
+    return $this->performRequest('GET', "/api/userjob/{$id}");
+}
 
-    public function obtainUserJobs()
-    {
-        return $this->performRequest('GET', '/userjob');
-    }
+public function obtainUserJobs()
+{
+    return $this->performRequest('GET', '/api/userjob');
+}
+
 }
