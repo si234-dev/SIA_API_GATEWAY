@@ -1,20 +1,33 @@
 <?php
 // Correct Lumen Syntax: Middleware is an element in the array, not a chained method
-$router->group(['middleware' => 'client'], function () use ($router) {
 
+
+
+use GuzzleHttp\Client;
+
+$router->get('/', function () use ($router) {
+    return response()->json(['message' => 'Gateway is running!']);
+});
+
+$router->group(['prefix' => 'api'], function () use ($router) {
+
+    // Users routes → forward to site1
+    $router->get('/users', 'UserController@getUsers');
+    $router->post('/users', 'UserController@add');
+    $router->get('/users/{id}', 'UserController@show');
+    $router->put('/users/{id}', 'UserController@update');
+    $router->delete('/users/{id}', 'UserController@delete');
+    $router->get('/userjob', 'UserController@getUserJobs');
+    $router->get('/userjob/{id}', 'UserController@showUserJob');
+
+    // Products routes → forward to site2
     $router->get('/products', 'ProductController@getProducts');
     $router->post('/products', 'ProductController@add');
     $router->get('/products/{id}', 'ProductController@show');
     $router->put('/products/{id}', 'ProductController@update');
     $router->delete('/products/{id}', 'ProductController@delete');
 
-    $router->get('/users', 'UserController@getUsers');
-    $router->post('/users', 'UserController@add');
-    $router->get('/users/{id}', 'UserController@show');
-    $router->put('/users/{id}', 'UserController@update');
-    $router->delete('/users/{id}', 'UserController@delete');
 });
-
 
 
 
@@ -25,7 +38,6 @@ $router->get('/test-success', function () use ($router) {
 });
 
 
-use GuzzleHttp\Client;
 
 $router->get('/site1', function () {
     $client = new Client();
