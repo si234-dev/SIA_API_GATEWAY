@@ -30,7 +30,7 @@ $app->configure('auth');
 $app->configure('services');
 
 $app->routeMiddleware([
-    'auth'   => App\Http\Middleware\Authenticate::class,
+    'auth'   => App\Http\Middleware\AuthMiddleware::class,
     'client' => App\Http\Middleware\CheckClientCredentials::class,
 ]);
 // 'client' => \Laravel\Passport\Http\Middleware\CheckClientCredentials::class,

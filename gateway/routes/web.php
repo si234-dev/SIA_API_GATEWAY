@@ -1,7 +1,4 @@
 <?php
-// Correct Lumen Syntax: Middleware is an element in the array, not a chained method
-
-
 
 use GuzzleHttp\Client;
 
@@ -9,7 +6,13 @@ $router->get('/', function () use ($router) {
     return response()->json(['message' => 'Gateway is running!']);
 });
 
-$router->group(['prefix' => 'api'], function () use ($router) {
+// Token routes (unprotected)
+$router->post('/token/generate', 'TokenController@generate');
+$router->get('/token/list', 'TokenController@list');
+$router->delete('/token/{id}', 'TokenController@delete');
+
+// Protected routes with auth middleware
+$router->group(['prefix' => 'api', 'middleware' => 'auth'], function () use ($router) {
 
     // Users routes → forward to site1
     $router->get('/users', 'UserController@getUsers');
